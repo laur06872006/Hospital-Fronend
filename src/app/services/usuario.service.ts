@@ -4,9 +4,10 @@ import { HttpClient } from "@angular/common/http";
 import { catchError, map, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 
-import { environment } from '../../environments/environment.prod';
+import { environment } from '../../environments/environment';
 import { RegistroFromulario } from '../interfaces/registro-form.interface';
 import { LoginFormulario } from '../interfaces/login-form.interface';
+import { Usuario } from '../models/usuario.model';
 
 const base_URL = environment.base_URL;
 
@@ -17,6 +18,7 @@ declare const gapi: any;
 })
 export class UsuarioService {
 
+  public usuarioLogeado: Usuario;
   public auth2: any;
 
   constructor(private http: HttpClient,
@@ -38,21 +40,30 @@ export class UsuarioService {
     })
   }
 
+  /////////////////////////////////
+  getToken(): string {
+    return localStorage.getItem('token') || '';
+  }
 
   /////////////////////////////////
   validarToken(): Observable<boolean> {
 
-    const token = localStorage.getItem('token') || '';
-
     return this.http.get(`${base_URL}/login/verificarToken`, {
       headers: {
-        'x-token': token
+        'x-token': this.getToken()
       }
     }).pipe(
-      // Actualizo el token en el localStore
-      tap((resp: any) => localStorage.setItem('token', resp.token)),
-      // Retorno true
-      map(resp => true),
+      map((resp: any) => {
+        // Actualizo el token en el localStore
+        localStorage.setItem('token', resp.token);
+
+        // Guardo la Informacion del Usuaio Logueado
+        const { role, google, nombre, email, img, id } = resp.usuario;
+        this.usuarioLogeado = new Usuario(id, nombre, '', email, google, role, img);
+
+        console.log(this.usuarioLogeado);
+        return true;
+      }),
       // Captura del Error 
       catchError(error => of(false))
     )
@@ -66,6 +77,17 @@ export class UsuarioService {
       );
   }
 
+  ///////////////////////////////////
+  actualizarPerfil(formPerfil: { nombre: string, email: string, role: string }) {
+
+    formPerfil = {
+      ...formPerfil,
+      role: this.usuarioLogeado.role
+    }
+    return this.http.put(`${base_URL}/usuarios/${this.usuarioLogeado.id}`, formPerfil, {
+      headers: { 'x-token': this.getToken() }
+    });
+  }
 
   //////////////////////////////////
   loginUsuario(formLogin: LoginFormulario) {
