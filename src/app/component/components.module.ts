@@ -1,21 +1,24 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
+import { ChartsModule } from 'ng2-charts';
 //Componentes
 import { IncrementadorComponent } from './incrementador/incrementador.component';
 import { GraficaDonaComponent } from './grafica-dona/grafica-dona.component';
+import { ModalImagenComponent } from './modal-imagen/modal-imagen.components';
 
-import { ChartsModule } from 'ng2-charts';
 
 
 @NgModule({
   declarations: [
     IncrementadorComponent,
     GraficaDonaComponent,
+    ModalImagenComponent
   ],
-  exports:[
+  exports: [
     IncrementadorComponent,
-    GraficaDonaComponent
+    GraficaDonaComponent,
+    ModalImagenComponent
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,86 @@
+<div class="row animated fadeIn fast">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+
+                <input (keyup)="buscar($event,cajaBuscar.value)" #cajaBuscar type="text" placeholder="Buscar Usuario"
+                    class="form-control" />
+
+            </div>
+        </div>
+    </div>
+</div>
+<div *ngIf="cargandoData" class="row animated fadeIn fas">
+    <div class="col-12">
+        <div class="alert alert-info text-center" role="alert">
+            <h4 class="alert-heading"> Cargando</h4>
+            <i class="fa fa-spin fa-refresh fa-2x"></i>
+            <p class="mb-0"> Por favor Espere</p>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="!cargandoData" class="row animated fadeIn fas">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Usuarios</h4>
+                <h6 *ngIf="!buscando" class="card-subtitle">
+                    {{ totalRegistros }} Registros - Pagina {{ paginaActual }} de {{ totalPagina}}
+                </h6>
+                <h6 *ngIf="buscando" class="card-subtitle">
+                    Encontrados(s) {{ totalRegistros }} Registro(s)
+                </h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="text-center width100">Usuario</th>
+                                <th class="text-center">Correo</th>
+                                <th class="text-center">Nombre</th>
+                                <th class="text-center width170">Rol</th>
+                                <th class="text-center width100">Acceso</th>
+                                <th class="text-nowrap text-center width100">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let usuario of listaUsuarios">
+                                <td class="text-center">
+                                    <img (click)="abrirModalImagen(usuario)" class="avatar cursor"
+                                        [src]='usuario.getImagen' alt="Click para cambiar Imagen">
+                                </td>
+                                <td class="text-center">{{usuario.email}}</td>
+                                <td class="text-center">{{usuario.nombre}}</td>
+                                <td class="text-center">
+                                    <select class="form-control" [(ngModel)]="usuario.role"
+                                        (change)="cambiarRole(usuario)">
+                                        <option>USER_ROLE</option>
+                                        <option>ADMIN_ROLE</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    <span *ngIf="usuario.google" class="label label-danger">Google</span>
+                                    <span *ngIf="!usuario.google" class="label label-info">Email</span>
+                                </td>
+                                <td class="text-nowrap text-center">
+                                    <a *ngIf="usuarioService.usuarioLogeado.id!=usuario.id" (click)="borrar(usuario)"
+                                        class="cursor" data-toggle="tooltip" data-original-title="Borrar">
+                                        <i class="fa fa-close text-danger"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div *ngIf="!buscando" class="text-center">
+                    <button (click)="paginaAnterior()" *ngIf="paginaActual!=1"
+                        class="btn btn-secondary">Anterior</button>
+                    &nbsp;
+                    <button (click)="paginaSiguiente()" *ngIf="paginaActual!=totalPagina"
+                        class="btn btn-secondary">Siguiente</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
